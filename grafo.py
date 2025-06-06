@@ -3,7 +3,7 @@ import math
 
 class Graph():
     def __init__(self, instancia):
-        self.__instanciaOriginaria = instancia
+        self.__instanciaOriginaria = './datasets/' + instancia
         self._matPadraoPeca = self.__criaMatPadraoPeca(self.__instanciaOriginaria)
         self._matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instanciaOriginaria)
         self._dicionarioPadroes = self.montarDictPadroes(self.__instanciaOriginaria)
@@ -154,7 +154,7 @@ def yuen3ppad(grafo: Graph):
 
 
 # exemplo de execução
-grafo = Graph('Random-1000-1000-54-10')
+grafo = Graph('Chu_Stuckey/Random-50-100-8-5')
 sequencia = yuen3ppad(grafo)
 print(grafo.NMPA(sequencia))
 print(sequencia)
