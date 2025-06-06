@@ -10,7 +10,11 @@ class Graph():
 
     @property
     def dicPadroes(self):
-        return self._dicionarioPadroes    
+        return self._dicionarioPadroes
+    
+    @property
+    def matPadraoPadrao(self):
+        return self._matPadraoPadrao     
     
     def __criaMatPadraoPeca(self, instancia):
         caminho = instancia + '.txt'
@@ -100,6 +104,32 @@ class Graph():
             for line in formatted_output:
                 f.write(line + '\n')
     
+
+''' 
+Problema: MOSP (Minimization of Open Stacks Problem)
+Descrição: Técnica de Pré-Processamento 5/6 _ Redução de pseudoPadrões. Analisa a vizinhança existente entre os padrões
+e caso exista vizinhanças iguais cria um super padrão
+Entrada: Objeto do tipo Graph
+Saída: Lista com a sequência de padrões no formato ndarray
+'''
+def reducaoPadroesPorPseudoEquivalencia(grafo : Graph):
+    vizinhos = {}
+    # Chaves vão ser os padrões existentes
+    # conteudo de cada chave vai ser os seus vizinhos
+    for i in range(len(grafo.matPadraoPadrao)):
+        vizinhos[i] = grafo.obtemVizinhos(i)
+
+    # Agora o dicionario vizinhos possui os vizinhos de cada padrao
+    # Preciso identificar quais padroes possuem lista de vizinhos iguais
+    # a lista retornada por obtemVizinhos contém os indices dos padrões e está ordenada.
+    
+    
+
+
+
+
+
+
 
 ''' 
 Problema: MOSP (Minimization of Open Stacks Problem)
