@@ -208,16 +208,49 @@ def reducaoPadroesPorPseudoEquivalencia(grafo : Graph):
         usado[i] = True
     
     return gruposFinais
+
+
+''' 
+Problema: MOSP (Minimization of Open Stacks Problem)
+Descrição: Verifica por padroes dominados dada o dict de padroes
+Entrada: Objeto do tipo grafo
+Saída: Set de padrões dominados por outros
+'''
+def checaDominados(grafo : Graph):
+    padroes = list(grafo.dicPadroes.keys())
+    dominados = set()
+    dominantes = {}
     
-
+    for i in range(len(padroes)):
+        p1 = padroes[i]
+        if p1 in dominados:
+            continue
+        
+        for j in range(len(padroes)):
+            if i == j:
+                continue
+            
+            p2 = padroes[j]
+            set1 = set(grafo.dicPadroes[p1])
+            set2 = set(grafo.dicPadroes[p2])
+            
+            # verifica se o padrão 1 é subconjunto do padrão 2 ou vice-versa
+            if set1.issubset(set2) and set1 != set2:
+                if p2 in dominantes.keys():
+                    dominantes[p2].append(p1)
+                else:
+                    dominantes[p2] = [p1]
+                dominados.add(p1)
+                break
+            
+            elif set2.issubset(set1) and set1 != set2:
+                if p1 in dominantes.keys():
+                    dominantes[p1].append(p2)
+                else:
+                    dominantes[p1] = [p2]
+                dominados.add(p2)
     
-
-
-
-
-
-
-
+    return sorted(dominados), dominantes
 
 ''' 
 Problema: MOSP (Minimization of Open Stacks Problem)
