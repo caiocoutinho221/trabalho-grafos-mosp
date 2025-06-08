@@ -111,6 +111,37 @@ class Graph():
             for line in formatted_output:
                 f.write(line + '\n')
     
+    # DFS para identificar as componentes do grafo
+    # Podemos tratar as componentes de maneira independente, por isso as identificamos
+    # Função retorna uma lista contendo as componentes do grafo
+    def componentesDFS(self):
+        componentes = []
+        idVertices = self.obtemTodosPadroes()
+        visitados = []
+        pilha = [0]
+        componenteAtual = []
+        while pilha:
+            atual = pilha.pop()
+            
+
+            if atual not in visitados:
+                visitados.append(atual)
+                idVertices.remove(atual)
+                componenteAtual.append(atual)
+                
+            for vizinho in reversed(self.obtemVizinhos(atual)):
+                if vizinho not in visitados:
+                    pilha.append(vizinho)
+
+            
+            if len(pilha) == 0 and len(idVertices) != 0:
+                pilha.append(idVertices[0])
+                if componenteAtual:
+                    componentes.append(componenteAtual)
+                    componenteAtual = []
+        
+        return componentes
+    
 
 ''' 
 Problema: MOSP (Minimization of Open Stacks Problem)
