@@ -3,18 +3,18 @@ import math
 
 class Graph():
     def __init__(self, instancia):
-        self.__instanciaOriginaria = './datasets/' + instancia
-        self._matPadraoPeca = self.__criaMatPadraoPeca(self.__instanciaOriginaria)
-        self._matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instanciaOriginaria)
-        self._dicionarioPadroes = self.montarDictPadroes(self.__instanciaOriginaria)
+        self.__instancia = './datasets/' + instancia
+        self.__matPadraoPeca = self.__criaMatPadraoPeca(self.__instancia)
+        self.__matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instancia)
+        self.__dicionarioPadroes = self.__montarDicionarioPadroes(self.__instancia)
 
     @property
     def dicPadroes(self):
-        return self._dicionarioPadroes
+        return self.__dicionarioPadroes
     
     @property
     def matPadraoPadrao(self):
-        return self._matPadraoPadrao     
+        return self.__matPadraoPadrao     
     
     def __criaMatPadraoPeca(self, instancia):
         caminho = instancia + '.txt'
@@ -32,6 +32,9 @@ class Graph():
             nrows, ncols = [int(field) for field in f.readline().split()]
             data = np.genfromtxt(f, dtype="int32", max_rows=nrows) #OBS. Instancias estao no formato padrao x peca
             # depois de gerar a matriz original, vamos criar a nova:
+
+            # ************* O código acima é o mesmo da função __criaMataPadraoPadrao Analisar isso
+
             # padrao x padrao
             data_shape = (nrows, nrows)
             arr = np.empty(data_shape, dtype=object)
@@ -50,52 +53,56 @@ class Graph():
                         previous_padroes.append(padrao)
                         
         return arr
-        
-    def montarDictPadroes(self, instancia):
+
+    # Constrói um dicionário contendo:
+    # [Padrão] -> [Peças]    
+    def __montarDicionarioPadroes(self):
         padroes_d = {}
-        m = self._matPadraoPeca
+        m = self.__matPadraoPeca
         l, c = m.shape
         for x in range(l):
             padroes_d[x] = [y for y in range(c) if m[x][y]]
             
         return padroes_d
     
+    # Retorna as peças associadas a um padrão, por meio do dicionarioPadroes
     def obtemPecas(self, padrao):
-        if(not self._dicionarioPadroes):
-            self._dicionarioPadroes = self.montarDictPadroes(self.__instanciaOriginaria)
-        return self._dicionarioPadroes[padrao]
+        return self.__dicionarioPadroes[padrao]
     
     # discutir criterio de desempate
+    # Retorna o padrao que contem a maior quantidade de peças
     def selecionaPadraoMaiorQtdPecas(self):
-        return max(self._dicionarioPadroes, key=lambda k: len(self._dicionarioPadroes[k]))
+        return max(self.__dicionarioPadroes, key=lambda k: len(self.__dicionarioPadroes[k]))
     
     # lista dos vertices?
     def obtemTodosPadroes(self):
-        return list(range(len(self._matPadraoPadrao)))
+        return list(range(len(self.__matPadraoPadrao)))
     
+
+    # Retorna uma lista contendo todos os padroes adjacentes ao padrao recebido
     def obtemVizinhos(self, padrao):
         vizinhos = []
-        size = len(self._matPadraoPadrao)
+        size = len(self.__matPadraoPadrao)
         for p in range(size):
-            if len(self._matPadraoPadrao[padrao][p]) > 0:
+            if len(self.__matPadraoPadrao[padrao][p]) > 0:
                 vizinhos.append(p)
                 
         return vizinhos
     
-    
+    # Calcula o númer maximo de pilhas abertas (substituir por mmosp)
     def NMPA(self, LP):
         if len(LP) > 1:
-            Q = self._matPadraoPeca[LP, :]
+            Q = self.__matPadraoPeca[LP, :]
             Q = np.maximum.accumulate(Q, axis=0) & np.maximum.accumulate(Q[::-1, :], axis=0)[::-1, :]
             pa = np.sum(Q, 1)
         else: # Apenas usado no caso de matrizes com uma só coluna.
-            Q = self._matPadraoPeca[LP, :]
+            Q = self.__matPadraoPeca[LP, :]
             pa = [np.sum(Q)]
         return np.amax(pa) # Obtém a maior pilha do vetor
     
     def salvarMatriz(self, nomeArquivo):
         formatted_output = []
-        for row in self._matPadraoPadrao:
+        for row in self.__matPadraoPadrao:
             formatted_row = ' '.join(str(elem) for elem in row)
             formatted_output.append(formatted_row)
         
@@ -107,23 +114,73 @@ class Graph():
 
 ''' 
 Problema: MOSP (Minimization of Open Stacks Problem)
-Descrição: Técnica de Pré-Processamento 5/6 _ Redução de pseudoPadrões. Analisa a vizinhança existente entre os padrões
-e caso exista vizinhanças iguais cria um super padrão
+Descrição: Técnica de Pré-Processamento 5/6 _ Redução de pseudoPadrões. Analisa a vizinhança, caso exista padrões
+com vizinhanças iguais, para vizinhos e peças, forma um grupo que deve ser agrupado posteriormente
 Entrada: Objeto do tipo Graph
-Saída: Lista com a sequência de padrões no formato ndarray
+Saída: Lista contendo os grupos que podem ser reduzidos
 '''
 def reducaoPadroesPorPseudoEquivalencia(grafo : Graph):
     vizinhos = {}
+    nroPadroes = len(grafo.matPadraoPadrao)
     # Chaves vão ser os padrões existentes
     # conteudo de cada chave vai ser os seus vizinhos
-    for i in range(len(grafo.matPadraoPadrao)):
+    for i in range(nroPadroes):
         vizinhos[i] = grafo.obtemVizinhos(i)
+
 
     # Agora o dicionario vizinhos possui os vizinhos de cada padrao
     # Preciso identificar quais padroes possuem lista de vizinhos iguais
     # a lista retornada por obtemVizinhos contém os indices dos padrões e está ordenada.
+
+    gruposFinais = []
+
+    # váriavel para indicar se um padrão ja pertence a algum grupo
+    usado = [False] * nroPadroes
+
+    for i in range(nroPadroes):
+
+        if usado[i]:
+            continue
     
+        # Vamos tentar construir um grupo, começamos adicionando o proprio vertice em que estamos
+        grupoAtual = [i]
+
+        viz_i = vizinhos[i]
+        # Vamos analisar se os vizinhos de i possuem a mesma vizinhança que ele
+        for j in viz_i:
+            if usado[j]:
+                continue
+
+            # Vamos comparar as listas de vizinhanças
+            if viz_i != vizinhos[j]:
+                continue # vizinhanças diferentes, ignoro e vou pro proximo
+
+            # Caso possuam vizinhanças identicas, vamos analisar se as peças também são iguais
+            # Vamos na matriz original,e para cada vizinho r (na lista de viz_i) analisamos se
+            # matriz[i,r] == matriz[j,r] -> lembrando que na matriz, uma celula contem uma lista 
+            # com as peças que os padroes compartilham
+            valido = True
+            for r in viz_i:
+                if grafo.matPadraoPadrao[i,r] != grafo.matPadraoPadrao[j,r]:
+                    valido = False
+                    break
+            
+            if valido:
+                grupoAtual.append(j)
+                usado[j] = True
+        
+        # Verificamos se o grupo atual é formado por mais algum padrão sem ser o i
+        if (len(grupoAtual) > 1):
+            gruposFinais.append(grupoAtual)
+
+        # Podemos marcar o i como usado para evitar ficar pesquisando
+        usado[i] = True
     
+    return gruposFinais
+    
+
+    
+
 
 
 
