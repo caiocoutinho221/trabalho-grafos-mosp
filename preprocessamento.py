@@ -58,40 +58,73 @@ def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
         # Podemos marcar o i como usado para evitar ficar pesquisando
         usado[i] = True
     
-    return gruposFinais
+    dicRelacionamentos = grafo.dicRelacionamentos
+    for grupo in gruposFinais:
+        nova_lista = list(grupo[1:])
 
+        for i in grupo[1:]:
+            if dicRelacionamentos[i] != []:
+                nova_lista.extend(dicRelacionamentos[i])
+            dicRelacionamentos[i] = [-1]
+
+    dicRelacionamentos[grupo[0]] = nova_lista
+
+    grafo.alteraRelacao(dicRelacionamentos)
+
+"""
+    Cria uma cópia de grafo.dicRelacionamentos, detecta
+    padrões dominados e dominadores (incluindo fechamento transitivo),
+    sobrescreve a cópia, e por fim chama grafo.alteraRelacao().
+    Retorna (lista_dominados, dict_dominantes).
+"""
 def checa_dominados(grafo: Graph):
-    padroes = list(grafo.dicPadroes.keys())
+    
+    # 1) copia o relacionamento atual
+    nova_rel = {p: list(v) for p, v in grafo.dicRelacionamentos.items()}
+
+    padroes   = list(grafo.dicPadroes.keys())
     dominados = set()
     dominantes = {}
-    
-    for i in range(len(padroes)):
-        p1 = padroes[i]
+
+    # 2) detecção de dominações diretas
+    for p1 in padroes:
         if p1 in dominados:
             continue
-        
-        for j in range(len(padroes)):
-            if i == j:
+        set1 = set(grafo.dicPadroes[p1])
+        for p2 in padroes:
+            if p1 == p2:
                 continue
-            
-            p2 = padroes[j]
-            set1 = set(grafo.dicPadroes[p1])
             set2 = set(grafo.dicPadroes[p2])
-            
-            # verifica se o padrão 1 é subconjunto do padrão 2 ou vice-versa
+
             if set1.issubset(set2) and set1 != set2:
-                if p2 in dominantes.keys():
-                    dominantes[p2].append(p1)
-                else:
-                    dominantes[p2] = [p1]
+                dominantes.setdefault(p2, []).append(p1)
                 dominados.add(p1)
                 break
-            
             elif set2.issubset(set1) and set1 != set2:
-                if p1 in dominantes.keys():
-                    dominantes[p1].append(p2)
-                else:
-                    dominantes[p1] = [p2]
+                dominantes.setdefault(p1, []).append(p2)
                 dominados.add(p2)
-    
-    return sorted(dominados), dominantes
+
+    # 3) fechamento transitivo: quem domina herda todos os dominados de seus filhos
+    def _dfs(node, acc):
+        for filho in dominantes.get(node, []):
+            if filho not in acc:
+                acc.add(filho)
+                _dfs(filho, acc)
+        return acc
+
+    for dom in list(dominantes):
+        transitivos = sorted(_dfs(dom, set()))
+        dominantes[dom] = transitivos
+
+    # 4) preenche a cópia com as regras finais
+    #    quem domina tem a lista completa; quem é dominado vira [-1]
+    for p in padroes:
+        nova_rel[p] = []              # limpa
+    for dom, filhos in dominantes.items():
+        nova_rel[dom] = filhos.copy()
+    for d in dominados:
+        nova_rel[d] = [-1]
+
+    print(nova_rel)
+    # 5) aplica na instância
+    grafo.alteraRelacao(nova_rel)

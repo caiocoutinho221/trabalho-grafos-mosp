@@ -1,5 +1,6 @@
 # sequenciamento.py
 import math
+from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia
 from grafo import Graph
 
 def yuen3ppad(grafo: Graph):
@@ -47,8 +48,9 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 if __name__ == '__main__':
-    inst = 'Chu_Stuckey/Random-50-100-8-5'
+    inst = 'Testes/Cenário 3 - 1 - exemplo'
     g = Graph(inst)
+    reducao_padroes_por_pseudo_equivalencia(g)
     print("Componentes:", g.componentesDFS())
     seq = yuen3ppad(g)
     print("Sequência Yuen3PPad:", seq)

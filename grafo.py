@@ -8,7 +8,7 @@ class Graph():
         self.__matPadraoPeca = self.__criaMatPadraoPeca(self.__instancia)
         self.__matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instancia)
         self.__dicionarioPadroesPecas = self.__montarDicionarioPadroesPecas()
-        self.__dicionarioRelacionamento = self.__criaRelacionamentos()
+        self.__dicionarioRelacionamentos = self.__criaRelacionamentos()
         
         
     # Inicializa um dicionario que vai ser alterado pelos pré-processamentos. Caso o padrão esteja como vazio, o padrão
@@ -25,11 +25,15 @@ class Graph():
     # Os pré-processamentos receberão uma cópia do dicionário original, depois de alterá-lo, forçará uma atualização na estrutura
     # do grafo atualizando o dicionário com as alterações feitas
     def alteraRelacao(self, novoDicionario):
-        self.__dicionarioRelacionamento = novoDicionario
+        self.__dicionarioRelacionamentos = novoDicionario
             
     @property
     def dicPadroes(self):
         return self.__dicionarioPadroesPecas
+    
+    @property
+    def dicRelacionamentos(self):
+        return self.__dicionarioRelacionamentos
     
     @property
     def matPadraoPadrao(self):
@@ -86,7 +90,7 @@ class Graph():
     
     # Retorna as peças associadas a um padrão, por meio do dicionarioPadroes
     def obtemPecas(self, padrao):
-        return self.__dicionarioPadroes[padrao]
+        return self.__dicionarioPadroesPecas[padrao]
     
     # discutir criterio de desempate
     # Retorna o padrao que contem a maior quantidade de peças
