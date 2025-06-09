@@ -6,7 +6,7 @@ class Graph():
         self.__instancia = './datasets/' + instancia
         self.__matPadraoPeca = self.__criaMatPadraoPeca(self.__instancia)
         self.__matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instancia)
-        self.__dicionarioPadroes = self.__montarDicionarioPadroes(self.__instancia)
+        self.__dicionarioPadroes = self.__montarDicionarioPadroes()
 
     @property
     def dicPadroes(self):
