@@ -123,7 +123,6 @@ class Graph():
         while pilha:
             atual = pilha.pop()
             
-
             if atual not in visitados:
                 visitados.append(atual)
                 idVertices.remove(atual)
@@ -137,9 +136,12 @@ class Graph():
             if len(pilha) == 0 and len(idVertices) != 0:
                 pilha.append(idVertices[0])
                 if componenteAtual:
+                    print(2)
                     componentes.append(componenteAtual)
                     componenteAtual = []
         
+        # Caso único quando há apenas uma componente
+        if componenteAtual: componentes.append(componenteAtual)
         return componentes
     
 
@@ -303,9 +305,9 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 
-
 # exemplo de execução
 grafo = Graph('Chu_Stuckey/Random-50-100-8-5')
+print(grafo.componentesDFS())
 sequencia = yuen3ppad(grafo)
-print(grafo.NMPA(sequencia))
-print(sequencia)
+#print(grafo.NMPA(sequencia))
+#print(sequencia)
