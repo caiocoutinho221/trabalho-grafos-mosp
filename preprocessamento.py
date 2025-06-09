@@ -125,6 +125,44 @@ def checa_dominados(grafo: Graph):
     for d in dominados:
         nova_rel[d] = [-1]
 
-    print(nova_rel)
     # 5) aplica na instância
     grafo.alteraRelacao(nova_rel)
+
+
+def pre_processamento_colapso_grau2(grafo: Graph):
+    padroes = grafo.obtemTodosPadroes()
+    relacao = {p: [] for p in padroes}  # Inicialmente, todos são listas vazias
+    pares_colapsados = []
+
+    # Passo 1: Identifica pares (p, q) onde ambos têm grau 2 e são vizinhos
+    for p in padroes:
+        vizinhos_p = set(grafo.obtemVizinhos(p))
+        if len(vizinhos_p) == 2:
+            for q in vizinhos_p:
+                vizinhos_q = set(grafo.obtemVizinhos(q))
+                if len(vizinhos_q) == 2 and p < q and p in vizinhos_q:
+                    pares_colapsados.append((p, q))
+
+    # Passo 2: Processa os pares
+    for p, q in pares_colapsados:
+        # Se p ou q já estão colapsados ([-1]), ignora
+        if (isinstance(relacao[p], list) and len(relacao[p])) > 0 and relacao[p][0] == -1:
+            continue
+        if (isinstance(relacao[q], list) and len(relacao[q])) > 0 and relacao[q][0] == -1:
+            continue
+
+        # Adiciona q aos dominados por p
+        relacao[p].append(q)
+
+        # Se q já dominava outros, transfere para p
+        if isinstance(relacao[q], list) and len(relacao[q]) > 0 and relacao[q][0] != -1:
+            relacao[p].extend(relacao[q])
+
+        # Marca q como colapsado ([-1])
+        relacao[q] = [-1]
+
+    # Remove duplicatas e ordena ([-1])
+    for k in relacao:
+        if isinstance(relacao[k], list) and len(relacao[k]) > 0 and relacao[k][0] != -1:
+            relacao[k] = sorted(set(relacao[k]))
+    grafo.alteraRelacao(relacao)
