@@ -51,6 +51,7 @@ if __name__ == '__main__':
     inst = 'SCOOP/scoop-B_GTM18A_139'
     g = Graph(inst)
     pre_processamento_colapso_grau2(g)
+    reducao_padroes_por_pseudo_equivalencia(g)
     print("Componentes:", g.componentesDFS())
     seq = yuen3ppad(g)
     print("Sequência Yuen3PPad:", seq)

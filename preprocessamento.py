@@ -58,18 +58,20 @@ def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
         # Podemos marcar o i como usado para evitar ficar pesquisando
         usado[i] = True
     
-    dicRelacionamentos = grafo.dicRelacionamentos
-    for grupo in gruposFinais:
-        nova_lista = list(grupo[1:])
+    if gruposFinais:
+        dicRelacionamentos = grafo.dicRelacionamentos
+        nova_lista = []
+        for grupo in gruposFinais:
+            nova_lista = list(grupo[1:])
 
-        for i in grupo[1:]:
-            if dicRelacionamentos[i] != []:
-                nova_lista.extend(dicRelacionamentos[i])
-            dicRelacionamentos[i] = [-1]
+            for i in grupo[1:]:
+                if dicRelacionamentos[i] != []:
+                    nova_lista.extend(dicRelacionamentos[i])
+                dicRelacionamentos[i] = [-1]
 
-    dicRelacionamentos[grupo[0]] = nova_lista
+        dicRelacionamentos[gruposFinais[0]] = nova_lista
 
-    grafo.alteraRelacao(dicRelacionamentos)
+        grafo.alteraRelacao(dicRelacionamentos)
 
 """
     Cria uma cópia de grafo.dicRelacionamentos, detecta
