@@ -7,11 +7,29 @@ class Graph():
         self.__instancia = './datasets/' + instancia
         self.__matPadraoPeca = self.__criaMatPadraoPeca(self.__instancia)
         self.__matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instancia)
-        self.__dicionarioPadroes = self.__montarDicionarioPadroes()
-
+        self.__dicionarioPadroesPecas = self.__montarDicionarioPadroesPecas()
+        self.__dicionarioRelacionamento = self.__criaRelacionamentos()
+        
+        
+    # Inicializa um dicionario que vai ser alterado pelos pré-processamentos. Caso o padrão esteja como vazio, o padrão
+    # deve ser tratado normalmente no sequenciamento. Caso seja -1, ele deve ser ignorado, já que será sequenciado posteriormente
+    # por alguma relação de dominância ou agrupamento. Por último, caso seja uma lista com elementos, ela representa os padrões 
+    # dominados pelo padrão que a contém.
+    def __criaRelacionamentos(self):
+        dicionario = {}
+        padroes = self.obtemTodosPadroes()
+        for padrao in padroes:
+            dicionario[padrao] = []
+        return dicionario
+    
+    # Os pré-processamentos receberão uma cópia do dicionário original, depois de alterá-lo, forçará uma atualização na estrutura
+    # do grafo atualizando o dicionário com as alterações feitas
+    def alteraRelacao(self, novoDicionario):
+        self.__dicionarioRelacionamento = novoDicionario
+            
     @property
     def dicPadroes(self):
-        return self.__dicionarioPadroes
+        return self.__dicionarioPadroesPecas
     
     @property
     def matPadraoPadrao(self):
@@ -57,7 +75,7 @@ class Graph():
 
     # Constrói um dicionário contendo:
     # [Padrão] -> [Peças]    
-    def __montarDicionarioPadroes(self):
+    def __montarDicionarioPadroesPecas(self):
         padroes_d = {}
         m = self.__matPadraoPeca
         l, c = m.shape
@@ -73,7 +91,7 @@ class Graph():
     # discutir criterio de desempate
     # Retorna o padrao que contem a maior quantidade de peças
     def selecionaPadraoMaiorQtdPecas(self):
-        return max(self.__dicionarioPadroes, key=lambda k: len(self.__dicionarioPadroes[k]))
+        return max(self.__dicionarioPadroesPecas, key=lambda k: len(self.__dicionarioPadroesPecas[k]))
     
     # lista dos vertices?
     def obtemTodosPadroes(self):
