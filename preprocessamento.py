@@ -62,6 +62,7 @@ def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
         dicRelacionamentos = grafo.dicRelacionamentos
         nova_lista = []
         for grupo in gruposFinais:
+            lider = grupo[0]
             nova_lista = list(grupo[1:])
 
             for i in grupo[1:]:
@@ -69,7 +70,7 @@ def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
                     nova_lista.extend(dicRelacionamentos[i])
                 dicRelacionamentos[i] = [-1]
 
-        dicRelacionamentos[gruposFinais[0]] = nova_lista
+            dicRelacionamentos[lider] = nova_lista
 
         grafo.alteraRelacao(dicRelacionamentos)
 
