@@ -127,7 +127,6 @@ def checa_dominados(grafo: Graph):
         nova_rel[dom] = filhos.copy()
     for d in dominados:
         nova_rel[d] = [-1]
-
     # 5) aplica na instância
     grafo.alteraRelacao(nova_rel)
 
@@ -146,6 +145,7 @@ def pre_processamento_colapso_grau2(grafo: Graph):
                 if len(vizinhos_q) == 2 and p < q and p in vizinhos_q:
                     pares_colapsados.append((p, q))
 
+    relacao = grafo.dicRelacionamentos
     # Passo 2: Processa os pares
     for p, q in pares_colapsados:
         # Se p ou q já estão colapsados ([-1]), ignora

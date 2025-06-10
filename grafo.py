@@ -138,30 +138,29 @@ class Graph():
     # Podemos tratar as componentes de maneira independente, por isso as identificamos
     # Função retorna uma lista contendo as componentes do grafo
     def componentesDFS(self):
+        # Considera apenas padrões que não foram removidos (não estão marcados como [-1])
+        padroes_ativos = [p for p in self.obtemTodosPadroes() if self.dicRelacionamentos[p] != [-1]]
+        visitados = set()
         componentes = []
-        idVertices = self.obtemTodosPadroes()
-        visitados = []
-        pilha = [0]
-        componenteAtual = []
-        while pilha:
-            atual = pilha.pop()
-            
-            if atual not in visitados:
-                visitados.append(atual)
-                idVertices.remove(atual)
-                componenteAtual.append(atual)
-                
-            for vizinho in reversed(self.obtemVizinhos(atual)):
-                if vizinho not in visitados:
-                    pilha.append(vizinho)
-
-            
-            if len(pilha) == 0 and len(idVertices) != 0:
-                pilha.append(idVertices[0])
-                if componenteAtual:
-                    componentes.append(componenteAtual)
-                    componenteAtual = []
         
-        # Caso único quando há apenas uma componente
-        if componenteAtual: componentes.append(componenteAtual)
+        for padrao in padroes_ativos:
+            if padrao not in visitados:
+                componente = []
+                pilha = [padrao]
+                
+                while pilha:
+                    atual = pilha.pop()
+                    if atual not in visitados:
+                        visitados.add(atual)
+                        componente.append(atual)
+                        # Adiciona vizinhos não removidos e não visitados
+                        for vizinho in self.obtemVizinhos(atual):
+                            if (vizinho in padroes_ativos and 
+                                vizinho not in visitados and 
+                                self.dicRelacionamentos[vizinho] != [-1]):
+                                pilha.append(vizinho)
+                
+                if componente:
+                    componentes.append(componente)
+                    
         return componentes

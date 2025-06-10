@@ -3,6 +3,40 @@ import math
 from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia, pre_processamento_colapso_grau2
 from grafo import Graph
 
+def expande_sequencia(sequencia, dicRelacionamentos):
+    sequencia_expandida = []
+    for padrao in sequencia:
+        sequencia_expandida.append(padrao)
+        # Adiciona padrões dominados imediatamente após o dominante
+        if dicRelacionamentos[padrao] and dicRelacionamentos[padrao] != [-1]:
+            sequencia_expandida.extend(dicRelacionamentos[padrao])
+    return sequencia_expandida
+
+class SubGraph:
+    def __init__(self, grafo_original, lista_padroes):
+        self.original = grafo_original
+        self.padroes = lista_padroes   # Padrões da componente
+
+    def obtemTodosPadroes(self):
+        return self.padroes
+
+    def obtemPecas(self, padrao):
+        return self.original.obtemPecas(padrao)
+
+    def obtemVizinhos(self, padrao):
+        # Filtra apenas vizinhos presentes na componente
+        return [v for v in self.original.obtemVizinhos(padrao) 
+                if v in self.padroes]
+
+    def selecionaPadraoMaiorQtdPecas(self):
+        return max(self.padroes, 
+                   key=lambda p: len(self.original.obtemPecas(p)))
+
+    def NMPA(self, LP):
+        return self.original.NMPA(LP)
+    
+    # Adicione outros métodos necessários pelas suas funções
+
 def yuen3ppad(grafo: Graph):
     # inicia pelo padrão com mais peças
     padraoInicial = grafo.selecionaPadraoMaiorQtdPecas()
@@ -16,7 +50,6 @@ def yuen3ppad(grafo: Graph):
             padroesAdjacentes.add(vizinho) 
 
     qtdPadroes = len(grafo.obtemTodosPadroes())
-
     while len(Spa) < qtdPadroes:
         padraoEscolhido = None
         maiorM = -math.inf
@@ -48,10 +81,29 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 if __name__ == '__main__':
-    inst = 'SCOOP/scoop-B_GTM18A_139'
+    inst = 'Testes/Cenário 3 - 1 - exemplo'
     g = Graph(inst)
+    
+    # Pré-processamento global
+    checa_dominados(g)
+    print(g.dicRelacionamentos)
     pre_processamento_colapso_grau2(g)
+    print(g.dicRelacionamentos)
     reducao_padroes_por_pseudo_equivalencia(g)
-    print("Componentes:", g.componentesDFS())
-    seq = yuen3ppad(g)
-    print("Sequência Yuen3PPad:", seq)
+    print(g.dicRelacionamentos)
+    
+    componentes = g.componentesDFS()
+    print("Componentes:", componentes)
+    
+    sequencia_dominantes = []  # Só padrões líderes/donminantes
+    for comp in componentes:
+        subg = SubGraph(g, comp)
+        seq_comp = yuen3ppad(subg)
+        sequencia_dominantes.extend(seq_comp)
+    
+    # EXPANDE a sequência com os dominados
+    sequencia_final = expande_sequencia(sequencia_dominantes, g.dicRelacionamentos)
+    
+    print("Sequência Yuen3PPad:", sequencia_final)
+    nmpa = g.NMPA(sequencia_final)
+    print("NMPA: ", nmpa)
