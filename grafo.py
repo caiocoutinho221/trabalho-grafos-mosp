@@ -164,3 +164,26 @@ class Graph():
                     componentes.append(componente)
                     
         return componentes
+
+class SubGraph:
+    def __init__(self, grafo_original, lista_padroes):
+        self.original = grafo_original
+        self.padroes = lista_padroes   # Padrões da componente
+
+    def obtemTodosPadroes(self):
+        return self.padroes
+
+    def obtemPecas(self, padrao):
+        return self.original.obtemPecas(padrao)
+
+    def obtemVizinhos(self, padrao):
+        # Filtra apenas vizinhos presentes na componente
+        return [v for v in self.original.obtemVizinhos(padrao) 
+                if v in self.padroes]
+
+    def selecionaPadraoMaiorQtdPecas(self):
+        return max(self.padroes, 
+                   key=lambda p: len(self.original.obtemPecas(p)))
+
+    def NMPA(self, LP):
+        return self.original.NMPA(LP)

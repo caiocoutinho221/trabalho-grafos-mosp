@@ -1,9 +1,9 @@
 # sequenciamento.py
 import math
 from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia, pre_processamento_colapso_grau2
-from grafo import Graph
+from grafo import Graph,SubGraph
 
-def expande_sequencia(sequencia, dicRelacionamentos):
+def atualiza_sequencia(sequencia, dicRelacionamentos):
     sequencia_expandida = []
     for padrao in sequencia:
         sequencia_expandida.append(padrao)
@@ -11,31 +11,7 @@ def expande_sequencia(sequencia, dicRelacionamentos):
         if dicRelacionamentos[padrao] and dicRelacionamentos[padrao] != [-1]:
             sequencia_expandida.extend(dicRelacionamentos[padrao])
     return sequencia_expandida
-
-class SubGraph:
-    def __init__(self, grafo_original, lista_padroes):
-        self.original = grafo_original
-        self.padroes = lista_padroes   # Padrões da componente
-
-    def obtemTodosPadroes(self):
-        return self.padroes
-
-    def obtemPecas(self, padrao):
-        return self.original.obtemPecas(padrao)
-
-    def obtemVizinhos(self, padrao):
-        # Filtra apenas vizinhos presentes na componente
-        return [v for v in self.original.obtemVizinhos(padrao) 
-                if v in self.padroes]
-
-    def selecionaPadraoMaiorQtdPecas(self):
-        return max(self.padroes, 
-                   key=lambda p: len(self.original.obtemPecas(p)))
-
-    def NMPA(self, LP):
-        return self.original.NMPA(LP)
     
-    # Adicione outros métodos necessários pelas suas funções
 
 def yuen3ppad(grafo: Graph):
     # inicia pelo padrão com mais peças
@@ -81,7 +57,7 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 if __name__ == '__main__':
-    inst = 'Testes/Cenário 3 - 1 - exemplo'
+    inst = 'SCOOP/scoop-B_CARLET_137'
     g = Graph(inst)
     
     # Pré-processamento global
@@ -102,7 +78,8 @@ if __name__ == '__main__':
         sequencia_dominantes.extend(seq_comp)
     
     # EXPANDE a sequência com os dominados
-    sequencia_final = expande_sequencia(sequencia_dominantes, g.dicRelacionamentos)
+    print("Sequência Dominantes: ",sequencia_dominantes, len(sequencia_dominantes))
+    sequencia_final = atualiza_sequencia(sequencia_dominantes, g.dicRelacionamentos)
     
     print("Sequência Yuen3PPad:", sequencia_final)
     nmpa = g.NMPA(sequencia_final)
