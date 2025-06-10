@@ -36,6 +36,10 @@ class Graph():
         return self.__dicionarioRelacionamentos
     
     @property
+    def matPadraoPeca(self):
+        return self.__matPadraoPeca
+    
+    @property
     def matPadraoPadrao(self):
         return self.__matPadraoPadrao     
     
@@ -101,7 +105,10 @@ class Graph():
     def obtemTodosPadroes(self):
         return list(range(len(self.__matPadraoPadrao)))
     
-
+    def obtemTodasPecas(self):
+        padroes, pecas = self.matPadraoPeca.shape
+        return list(range(pecas))
+    
     # Retorna uma lista contendo todos os padroes adjacentes ao padrao recebido
     def obtemVizinhos(self, padrao):
         vizinhos = []
@@ -111,17 +118,6 @@ class Graph():
                 vizinhos.append(p)
                 
         return vizinhos
-    
-    # Calcula o númer maximo de pilhas abertas (substituir por mmosp)
-    def NMPA(self, LP):
-        if len(LP) > 1:
-            Q = self.__matPadraoPeca[LP, :]
-            Q = np.maximum.accumulate(Q, axis=0) & np.maximum.accumulate(Q[::-1, :], axis=0)[::-1, :]
-            pa = np.sum(Q, 1)
-        else: # Apenas usado no caso de matrizes com uma só coluna.
-            Q = self.__matPadraoPeca[LP, :]
-            pa = [np.sum(Q)]
-        return np.amax(pa) # Obtém a maior pilha do vetor
     
     def salvarMatriz(self, nomeArquivo):
         formatted_output = []
