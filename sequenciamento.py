@@ -57,7 +57,7 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 if __name__ == '__main__':
-    inst = 'SCOOP/scoop-B_CARLET_137'
+    inst = 'Frinhani, Carvalho & Soma/Random-1000-1000-50-7'
     g = Graph(inst)
     
     # Pré-processamento global
