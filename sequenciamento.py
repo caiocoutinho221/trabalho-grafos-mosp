@@ -2,7 +2,7 @@
 import math
 import numpy as np
 from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia, pre_processamento_colapso_grau2
-from grafo import Graph, SubGraph
+from grafo import Graph, SubGraph, desenhaGrafoPadraoPadrao
 
 def PilhasAbertas(LP, graph):
     if len(LP) > 1:
@@ -113,9 +113,10 @@ def yuen3ppad(grafo: Graph):
     return Spa
 
 if __name__ == '__main__':
-    inst = 'Frinhani, Carvalho & Soma/Random-1000-1000-54-9'
+    inst = 'Testes/Cenário 3 - 1 - exemplo'
     g = Graph(inst)
     
+    vertices, arestas = g.contarVerticesArestas()
     # Pré-processamento global
     checa_dominados(g)
     print(g.dicRelacionamentos)
@@ -123,6 +124,10 @@ if __name__ == '__main__':
     print(g.dicRelacionamentos)
     reducao_padroes_por_pseudo_equivalencia(g)
     print(g.dicRelacionamentos)
+    
+    vertices, arestas = g.contarVerticesArestas()
+    print(f"V: {vertices} ; A: {arestas}")
+    desenhaGrafoPadraoPadrao(g, "novo")
     
     componentes = g.componentesDFS()
     print("Componentes:", componentes)

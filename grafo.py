@@ -1,6 +1,6 @@
 # grafo.py
 import numpy as np
-import math
+from igraph import Graph as igraph, plot
 
 class Graph():
     def __init__(self, instancia):
@@ -9,7 +9,6 @@ class Graph():
         self.__matPadraoPadrao = self.__criaMatPadraoPadrao(self.__instancia)
         self.__dicionarioPadroesPecas = self.__montarDicionarioPadroesPecas()
         self.__dicionarioRelacionamentos = self.__criaRelacionamentos()
-        
         
     # Inicializa um dicionario que vai ser alterado pelos pré-processamentos. Caso o padrão esteja como vazio, o padrão
     # deve ser tratado normalmente no sequenciamento. Caso seja -1, ele deve ser ignorado, já que será sequenciado posteriormente
@@ -119,16 +118,27 @@ class Graph():
                 
         return vizinhos
     
-    def salvarMatriz(self, nomeArquivo):
+    def salvarMatriz(self, nomeArquivo="generico"):
         formatted_output = []
         for row in self.__matPadraoPadrao:
-            formatted_row = ' '.join(str(elem) for elem in row)
+            formatted_row = ' '.join(str(elem).replace(" ", "") for elem in row)
             formatted_output.append(formatted_row)
         
         output_file = nomeArquivo + '.txt'
         with open(output_file, 'w') as f:
             for line in formatted_output:
                 f.write(line + '\n')
+                
+    def contarVerticesArestas(self):
+        validos = [i for i in self.obtemTodosPadroes() if self.dicRelacionamentos[i] != [-1]]
+        num_vertices = len(validos)
+        num_arestas = 0
+        mat = self.matPadraoPadrao
+        for idx, i in enumerate(validos):
+            for j in validos[idx+1:]:
+                if len(mat[i, j]) > 0:
+                    num_arestas += 1
+        return num_vertices, num_arestas
     
     # DFS para identificar as componentes do grafo
     # Podemos tratar as componentes de maneira independente, por isso as identificamos
@@ -183,3 +193,61 @@ class SubGraph:
 
     def NMPA(self, LP):
         return self.original.NMPA(LP)
+    
+def desenhaGrafoPadraoPadrao(grafo: Graph, nomeArq = "generico"):
+    lista_dominados = []
+    dominantes = {}
+    # Popula arrays de dominantes e dominados
+    for x in grafo.dicRelacionamentos.keys():
+        if len(grafo.dicRelacionamentos[x]) > 0:
+            if grafo.dicRelacionamentos[x][0] == -1:
+                lista_dominados.append(x)
+            else:
+                dominantes[x] = grafo.dicRelacionamentos[x]
+
+    print(f"dominados: {lista_dominados}\n")
+    print(f"DOMINANES: {dominantes}\n")
+    
+    # Cria a matriz padrão x padrão
+    matriz = grafo.matPadraoPadrao
+    nrows = matriz.shape[0]
+    
+    # Cria o grafo
+    g = igraph()
+    
+    validos = [nrow for nrow in range(nrows) if nrow not in lista_dominados]
+    print(f"Validos: {validos}")
+    # Adiciona os vértices (cada vértice é um padrão)
+    g.add_vertices(validos)
+    
+    # Adiciona as arestas (conexões entre padrões)
+    edges = []
+    edge_labels = []
+    
+    # Itera apenas na metade superior da matriz para evitar duplicatas
+    for i in range(len(validos)):
+        print(f"i: {i}")
+        for j in range(i + 1, len(validos)):
+            print(f"    j: {j}")
+            pecas_compartilhadas = matriz[validos[i], validos[j]]
+            if pecas_compartilhadas:  # Se há peças compartilhadas
+                #print(f"    encontrou peças compartilhadas entre {validos[i]} e {validos[j]}")
+                edges.append((i, j))
+                edge_labels.append(", ".join(map(str, pecas_compartilhadas)))
+    
+    g.add_edges(edges)
+    
+    # Configurações visuais
+    visual_style = {
+        "vertex_label": [ f"Padrão {i}\n{dominantes[i]}" if i in dominantes else f"Padrão {i}" for i in validos],
+        "edge_label": edge_labels,
+        "vertex_color": "lightblue",
+        "edge_color": "gray",
+        "vertex_size": 66,
+        "layout": g.layout("fr"),  # Layout Fruchterman-Reingold
+        "bbox": (1920, 1080),
+        "margin": 50
+    }
+    
+    # Plota o grafo
+    plot(g, target=f"{nomeArq}.png", **visual_style)
