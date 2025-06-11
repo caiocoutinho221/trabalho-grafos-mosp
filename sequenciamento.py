@@ -112,11 +112,30 @@ def yuen3ppad(grafo: Graph):
                 padroesAdjacentes.add(vizinho)
     return Spa
 
+def executaYuenPreProcessado(grafo: Graph, componentes):
+    sequencia_dominantes = []  # Só padrões líderes/donminantes
+    for comp in componentes:
+        subg = SubGraph(g, comp)
+        seq_comp = yuen3ppad(subg)
+        sequencia_dominantes.extend(seq_comp)
+    
+    # EXPANDE a sequência com os dominados
+    print("Sequência Dominantes: ",sequencia_dominantes, len(sequencia_dominantes))
+    sequencia_final = atualiza_sequencia(sequencia_dominantes, g.dicRelacionamentos)
+    return sequencia_final
+
 if __name__ == '__main__':
-    inst = 'Testes/Cenário 3 - 1 - exemplo'
+    inst = 'Faggioli_Bentivoglio/p1010n9'
+    #inst = 'Testes/Cenário 3 - 1 - exemplo'
     g = Graph(inst)
     
     vertices, arestas = g.contarVerticesArestas()
+    seq = yuen3ppad(g)
+    print("Sequência Yuen3PPad:", seq)
+    nmpa = NMPA(seq, g)
+    mmosp = MMOSP(seq, g)
+    print(f"NMPA: {nmpa} ; MMOSP: {mmosp}")
+    
     # Pré-processamento global
     checa_dominados(g)
     print(g.dicRelacionamentos)
@@ -127,21 +146,10 @@ if __name__ == '__main__':
     
     vertices, arestas = g.contarVerticesArestas()
     print(f"V: {vertices} ; A: {arestas}")
-    desenhaGrafoPadraoPadrao(g, "novo")
     
     componentes = g.componentesDFS()
     print("Componentes:", componentes)
-    
-    sequencia_dominantes = []  # Só padrões líderes/donminantes
-    for comp in componentes:
-        subg = SubGraph(g, comp)
-        seq_comp = yuen3ppad(subg)
-        sequencia_dominantes.extend(seq_comp)
-    
-    # EXPANDE a sequência com os dominados
-    print("Sequência Dominantes: ",sequencia_dominantes, len(sequencia_dominantes))
-    sequencia_final = atualiza_sequencia(sequencia_dominantes, g.dicRelacionamentos)
-    
+    sequencia_final = executaYuenPreProcessado(g, componentes)
     print("Sequência Yuen3PPad:", sequencia_final)
     nmpa = NMPA(sequencia_final, g)
     mmosp = MMOSP(sequencia_final, g)

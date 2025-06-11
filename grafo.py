@@ -226,9 +226,9 @@ def desenhaGrafoPadraoPadrao(grafo: Graph, nomeArq = "generico"):
     
     # Itera apenas na metade superior da matriz para evitar duplicatas
     for i in range(len(validos)):
-        print(f"i: {i}")
+        #print(f"i: {i}")
         for j in range(i + 1, len(validos)):
-            print(f"    j: {j}")
+            #print(f"    j: {j}")
             pecas_compartilhadas = matriz[validos[i], validos[j]]
             if pecas_compartilhadas:  # Se há peças compartilhadas
                 #print(f"    encontrou peças compartilhadas entre {validos[i]} e {validos[j]}")

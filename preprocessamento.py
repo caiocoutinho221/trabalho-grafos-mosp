@@ -95,7 +95,7 @@ def checa_dominados(grafo: Graph):
             continue
         set1 = set(grafo.dicPadroes[p1])
         for p2 in padroes:
-            if p1 == p2:
+            if p1 == p2 or p2 in dominados:
                 continue
             set2 = set(grafo.dicPadroes[p2])
 
@@ -107,6 +107,8 @@ def checa_dominados(grafo: Graph):
                 dominantes.setdefault(p1, []).append(p2)
                 dominados.add(p2)
 
+    print(dominados)
+    print(dominantes)
     # 3) fechamento transitivo: quem domina herda todos os dominados de seus filhos
     def _dfs(node, acc):
         for filho in dominantes.get(node, []):
