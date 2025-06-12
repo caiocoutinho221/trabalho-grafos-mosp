@@ -112,16 +112,18 @@ def yuen3ppad(grafo: Graph):
                 padroesAdjacentes.add(vizinho)
     return Spa
 
-def executaYuenPreProcessado(grafo: Graph, componentes):
+def executaYuenPreProcessado(grafo: Graph):
+    componentes = grafo.componentesDFS()
+
     sequencia_dominantes = []  # Só padrões líderes/donminantes
     for comp in componentes:
-        subg = SubGraph(g, comp)
+        subg = SubGraph(grafo, comp)
         seq_comp = yuen3ppad(subg)
         sequencia_dominantes.extend(seq_comp)
     
     # EXPANDE a sequência com os dominados
     print("Sequência Dominantes: ",sequencia_dominantes, len(sequencia_dominantes))
-    sequencia_final = atualiza_sequencia(sequencia_dominantes, g.dicRelacionamentos)
+    sequencia_final = atualiza_sequencia(sequencia_dominantes, grafo.dicRelacionamentos)
     return sequencia_final
 
 if __name__ == '__main__':

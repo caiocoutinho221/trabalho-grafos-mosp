@@ -110,7 +110,7 @@ class Graph():
     
     def obtemDensidade(self):
         v, a = self.contarVerticesArestas()
-        return f"{2*a / ((v-1) * v):.3f}"
+        return 2*a / ((v-1) * v)
     
     # Retorna uma lista contendo todos os padroes adjacentes ao padrao recebido
     def obtemVizinhos(self, padrao):
