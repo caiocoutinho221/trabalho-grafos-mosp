@@ -125,34 +125,3 @@ def executaYuenPreProcessado(grafo: Graph):
     print("Sequência Dominantes: ",sequencia_dominantes, len(sequencia_dominantes))
     sequencia_final = atualiza_sequencia(sequencia_dominantes, grafo.dicRelacionamentos)
     return sequencia_final
-
-if __name__ == '__main__':
-    inst = 'Faggioli_Bentivoglio/p1010n9'
-    #inst = 'Testes/Cenário 3 - 1 - exemplo'
-    g = Graph(inst)
-    
-    vertices, arestas = g.contarVerticesArestas()
-    seq = yuen3ppad(g)
-    print("Sequência Yuen3PPad:", seq)
-    nmpa = NMPA(seq, g)
-    mmosp = MMOSP(seq, g)
-    print(f"NMPA: {nmpa} ; MMOSP: {mmosp}")
-    
-    # Pré-processamento global
-    checa_dominados(g)
-    print(g.dicRelacionamentos)
-    pre_processamento_colapso_grau2(g)
-    print(g.dicRelacionamentos)
-    reducao_padroes_por_pseudo_equivalencia(g)
-    print(g.dicRelacionamentos)
-    print(g.obtemDensidade())
-    vertices, arestas = g.contarVerticesArestas()
-    print(f"V: {vertices} ; A: {arestas}")
-    
-    componentes = g.componentesDFS()
-    print("Componentes:", componentes)
-    sequencia_final = executaYuenPreProcessado(g, componentes)
-    print("Sequência Yuen3PPad:", sequencia_final)
-    nmpa = NMPA(sequencia_final, g)
-    mmosp = MMOSP(sequencia_final, g)
-    print(f"NMPA: {nmpa} ; MMOSP: {mmosp}")

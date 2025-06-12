@@ -7,7 +7,7 @@ from sequenciamento import executaYuenPreProcessado, yuen3ppad, MMOSP, NMPA
 
 # Configurações de diretório
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASETS_DIR = os.path.join(BASE_DIR, 'datasets', 'Frinhani, Carvalho & Soma')
+DATASETS_DIR = os.path.join(BASE_DIR, 'datasets', 'Faggioli_Bentivoglio')
 VALOR_OTIMO_DIR = os.path.join(BASE_DIR, 'valores_otimos')
 RESULTADOS_DIR = os.path.join(BASE_DIR, 'resultados')
 os.makedirs(RESULTADOS_DIR, exist_ok=True)
