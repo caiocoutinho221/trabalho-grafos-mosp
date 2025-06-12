@@ -143,7 +143,7 @@ if __name__ == '__main__':
     print(g.dicRelacionamentos)
     reducao_padroes_por_pseudo_equivalencia(g)
     print(g.dicRelacionamentos)
-    
+    print(g.obtemDensidade())
     vertices, arestas = g.contarVerticesArestas()
     print(f"V: {vertices} ; A: {arestas}")
     

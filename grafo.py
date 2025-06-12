@@ -108,6 +108,10 @@ class Graph():
         padroes, pecas = self.matPadraoPeca.shape
         return list(range(pecas))
     
+    def obtemDensidade(self):
+        v, a = self.contarVerticesArestas()
+        return f"{2*a / ((v-1) * v):.3f}"
+    
     # Retorna uma lista contendo todos os padroes adjacentes ao padrao recebido
     def obtemVizinhos(self, padrao):
         vizinhos = []
