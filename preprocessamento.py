@@ -1,6 +1,7 @@
 # preprocessamento.py
 from grafo import Graph
 
+# Técnica de redução por pseudo equivalência
 def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
     vizinhos = {}
     nroPadroes = len(grafo.matPadraoPadrao)
@@ -74,12 +75,7 @@ def reducao_padroes_por_pseudo_equivalencia(grafo: Graph):
 
         grafo.alteraRelacao(dicRelacionamentos)
 
-"""
-    Cria uma cópia de grafo.dicRelacionamentos, detecta
-    padrões dominados e dominadores (incluindo fechamento transitivo),
-    sobrescreve a cópia, e por fim chama grafo.alteraRelacao().
-    Retorna (lista_dominados, dict_dominantes).
-"""
+# Técnica de redução por dominância
 def checa_dominados(grafo: Graph):
     
     # 1) copia o relacionamento atual
@@ -107,8 +103,8 @@ def checa_dominados(grafo: Graph):
                 dominantes.setdefault(p1, []).append(p2)
                 dominados.add(p2)
 
-    print(dominados)
-    print(dominantes)
+    """print(dominados)
+    print(dominantes)"""
     # 3) fechamento transitivo: quem domina herda todos os dominados de seus filhos
     def _dfs(node, acc):
         for filho in dominantes.get(node, []):
@@ -132,7 +128,7 @@ def checa_dominados(grafo: Graph):
     # 5) aplica na instância
     grafo.alteraRelacao(nova_rel)
 
-
+# Técnica de redução por colapso de grau 2
 def pre_processamento_colapso_grau2(grafo: Graph):
     padroes = grafo.obtemTodosPadroes()
     relacao = {p: [] for p in padroes}  # Inicialmente, todos são listas vazias

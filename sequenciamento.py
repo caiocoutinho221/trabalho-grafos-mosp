@@ -4,6 +4,7 @@ import numpy as np
 from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia, pre_processamento_colapso_grau2
 from grafo import Graph, SubGraph, desenhaGrafoPadraoPadrao
 
+# Função auxiliar do MMOSP. Disponibilizado por Frinhani e adaptado para a estrutura da classe Graph
 def PilhasAbertas(LP, graph):
     if len(LP) > 1:
         pa = []
@@ -42,6 +43,7 @@ def PilhasAbertas(LP, graph):
         pa = [np.sum(Q)]
         return pa
 
+# Calcula MMOSP. Disponibilizado por Frinhani
 def MMOSP(LP, grafo: Graph):
     vetor = PilhasAbertas(LP, grafo)
     mosp = np.amax(vetor) # Obtem a maior pilha do vetor
@@ -69,6 +71,7 @@ def NMPA(LP, grafo: Graph):
         pa = [np.sum(Q)]
     return np.amax(pa) # Obtém a maior pilha do vetor
 
+# Técnica de sequenciamento aplicada. Baseado no pseudocódigo do artigo Frinhani 2018
 def yuen3ppad(grafo: Graph):
     # inicia pelo padrão com mais peças
     padraoInicial = grafo.selecionaPadraoMaiorQtdPecas()
@@ -112,6 +115,7 @@ def yuen3ppad(grafo: Graph):
                 padroesAdjacentes.add(vizinho)
     return Spa
 
+# Função para executar a técnica de componentes em conjunto de qualquer pré-processamento
 def executaYuenPreProcessado(grafo: Graph):
     componentes = grafo.componentesDFS()
 

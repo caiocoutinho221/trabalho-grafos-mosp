@@ -1,3 +1,4 @@
+# testes.py
 import time
 from preprocessamento import checa_dominados, reducao_padroes_por_pseudo_equivalencia, pre_processamento_colapso_grau2
 from grafo import Graph, SubGraph
@@ -7,7 +8,6 @@ from sequenciamento import executaYuenPreProcessado, yuen3ppad, MMOSP, NMPA
 
 # Configurações de diretório
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASETS_DIR = os.path.join(BASE_DIR, 'datasets', 'Faggioli_Bentivoglio')
 VALOR_OTIMO_DIR = os.path.join(BASE_DIR, 'valores_otimos')
 RESULTADOS_DIR = os.path.join(BASE_DIR, 'resultados')
 os.makedirs(RESULTADOS_DIR, exist_ok=True)
@@ -55,7 +55,6 @@ def carregar_valores_otimos():
                         valores_otimos[dataset] = float(row[1])
                     except ValueError:
                         continue
-    print(valores_otimos)
     return valores_otimos
 
 # Dicionário global de valores ótimos
@@ -73,11 +72,14 @@ def processar_instancia_sem_sequenciar(instancia_relativa, tecnica=None):
     dens = grafo.obtemDensidade()
     
     tempo_preprocess = 0.0
+    
+    # Sobrepõe para caso a técnica de pré-processamento seja executada
     if tecnica:
         tempo_preprocess, _ = run_timed_function(tecnica, grafo)
         vert, arest = grafo.contarVerticesArestas()
         dens = grafo.obtemDensidade()
-    
+        
+    # Retorna os valores para serem adicionados na linha
     return {
         'tempo': tempo_preprocess,
         'tamanho': f"({vert};{arest})",
@@ -114,6 +116,7 @@ def processar_instancia_sequenciando(instancia_relativa, tecnica=None):
     if valor_otimo is not None and valor_otimo > 0:
         gap = ((sol_nmpa - valor_otimo) / valor_otimo) * 100
     
+    # Retorna os valores para serem adicionados na linha
     return {
         'valorOtimo': valor_otimo,
         'tempo_total': tempo_preprocess + tempo_seq,
@@ -156,6 +159,7 @@ def executar_experimentos_sequenciamento():
                 for nome_tecnica, funcao_tecnica in tecnicas_pre_processamento.items():
                     print(f"  - Técnica: {nome_tecnica}", end='', flush=True)
                     
+                    # Retorna os valores para serem adicionados na linha
                     resultados = processar_instancia_sequenciando(
                         instancia_relativa, 
                         funcao_tecnica if nome_tecnica != 'sem' else None
@@ -206,6 +210,7 @@ def executar_experimentos_tamanho():
                 for nome_tecnica, funcao_tecnica in tecnicas_pre_processamento.items():
                     print(f"  - Técnica: {nome_tecnica}", end='', flush=True)
                     
+                    # Processa a instância relativa
                     resultados = processar_instancia_sem_sequenciar(
                         instancia_relativa, 
                         funcao_tecnica if nome_tecnica != 'sem' else None
@@ -214,7 +219,7 @@ def executar_experimentos_tamanho():
                     linha_resultados.extend([
                         f"{resultados['tempo']:.3f}",
                         resultados['tamanho'],
-                        resultados['densidade']
+                        f"{resultados['densidade']:3f}"
                     ])
                     
                     print(f" | Tempo: {resultados['tempo']:.3f}s")
@@ -224,5 +229,18 @@ def executar_experimentos_tamanho():
     print(f"\nExperimento concluído! Resultados salvos em: {CSV_RESULTADOS}")
 
 if __name__ == "__main__":
-   # executar_experimentos_tamanho()
-    executar_experimentos_sequenciamento()
+    print("Escolha o tipo de experimento a executar:")
+    print("1 - Análise de tamanho do grafo")
+    print("2 - Sequenciamento com e sem pré-processamento")
+    escolha = input("Digite 1 ou 2: ").strip()
+
+    pasta = input("Digite o nome da pasta onde estão as instâncias: ").strip()
+    DATASETS_DIR = os.path.join(BASE_DIR, 'datasets', pasta)
+
+    if escolha == "1":
+        executar_experimentos_tamanho()
+    elif escolha == "2":
+        executar_experimentos_sequenciamento()
+    else:
+        print("Opção inválida.")
+

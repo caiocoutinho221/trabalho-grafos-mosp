@@ -3,6 +3,7 @@ import numpy as np
 from igraph import Graph as igraph, plot
 
 class Graph():
+    # Inicialização básica das estruturas do grafo
     def __init__(self, instancia):
         self.__instancia = './datasets/' + instancia
         self.__matPadraoPeca = self.__criaMatPadraoPeca(self.__instancia)
@@ -25,23 +26,28 @@ class Graph():
     # do grafo atualizando o dicionário com as alterações feitas
     def alteraRelacao(self, novoDicionario):
         self.__dicionarioRelacionamentos = novoDicionario
-            
+    
+    # Retorna o dicionário que relaciona padrões -> peças associadas a eles            
     @property
     def dicPadroes(self):
         return self.__dicionarioPadroesPecas
     
+    # Retorna o dicionário que estrutura os relacionamentos entre padrões associados após pré-processamento
     @property
     def dicRelacionamentos(self):
         return self.__dicionarioRelacionamentos
     
+    # Retorna a matriz padrão x peça
     @property
     def matPadraoPeca(self):
         return self.__matPadraoPeca
     
+    # Retorna a matriz padrão x padrão
     @property
     def matPadraoPadrao(self):
         return self.__matPadraoPadrao     
     
+    # Cria a matriz padrão x peça após ler o dataset
     def __criaMatPadraoPeca(self, instancia):
         caminho = instancia + '.txt'
         with open(caminho, 'rb') as f:
@@ -57,10 +63,8 @@ class Graph():
             # entre os elementos as peças como arestas
             nrows, ncols = [int(field) for field in f.readline().split()]
             data = np.genfromtxt(f, dtype="int32", max_rows=nrows) #OBS. Instancias estao no formato padrao x peca
-            # depois de gerar a matriz original, vamos criar a nova:
-
-            # ************* O código acima é o mesmo da função __criaMataPadraoPadrao Analisar isso
-
+            
+            # Depois de gerar a matriz original, vamos criar a nova:
             # padrao x padrao
             data_shape = (nrows, nrows)
             arr = np.empty(data_shape, dtype=object)
@@ -68,7 +72,8 @@ class Graph():
                 for index2 in range(nrows):
                     arr[index, index2] = []
             
-            # agora para cada peça (col na antiga) passamos pelas linhas e incluimos aquela peça na aresta
+            # Agora para cada peça (coluna na matriz originária) passamos pelas linhas e 
+            # incluimos aquela peça na aresta
             for peca in range(ncols):
                 previous_padroes = []
                 for padrao in range(nrows):
@@ -100,7 +105,7 @@ class Graph():
     def selecionaPadraoMaiorQtdPecas(self):
         return max(self.__dicionarioPadroesPecas, key=lambda k: len(self.__dicionarioPadroesPecas[k]))
     
-    # lista dos vertices?
+    # Retorna a lista de padrões do grafo
     def obtemTodosPadroes(self):
         return list(range(len(self.__matPadraoPadrao)))
     
@@ -108,6 +113,7 @@ class Graph():
         padroes, pecas = self.matPadraoPeca.shape
         return list(range(pecas))
     
+    # Retorna a densidade do grafo
     def obtemDensidade(self):
         v, a = self.contarVerticesArestas()
         return 2*a / ((v-1) * v)
@@ -122,6 +128,7 @@ class Graph():
                 
         return vizinhos
     
+    # Salva a matriz em um .txt para permitir depuração
     def salvarMatriz(self, nomeArquivo="generico"):
         formatted_output = []
         for row in self.__matPadraoPadrao:
@@ -132,7 +139,8 @@ class Graph():
         with open(output_file, 'w') as f:
             for line in formatted_output:
                 f.write(line + '\n')
-                
+
+    # Retorna os vértices e arestas do grafo, considerando os relacionamentos atuais
     def contarVerticesArestas(self):
         validos = [i for i in self.obtemTodosPadroes() if self.dicRelacionamentos[i] != [-1]]
         num_vertices = len(validos)
@@ -175,6 +183,7 @@ class Graph():
                     
         return componentes
 
+# Cria uma classe destinada a gerar subgrafos para as componentes
 class SubGraph:
     def __init__(self, grafo_original, lista_padroes):
         self.original = grafo_original
@@ -230,12 +239,9 @@ def desenhaGrafoPadraoPadrao(grafo: Graph, nomeArq = "generico"):
     
     # Itera apenas na metade superior da matriz para evitar duplicatas
     for i in range(len(validos)):
-        #print(f"i: {i}")
         for j in range(i + 1, len(validos)):
-            #print(f"    j: {j}")
             pecas_compartilhadas = matriz[validos[i], validos[j]]
             if pecas_compartilhadas:  # Se há peças compartilhadas
-                #print(f"    encontrou peças compartilhadas entre {validos[i]} e {validos[j]}")
                 edges.append((i, j))
                 edge_labels.append(", ".join(map(str, pecas_compartilhadas)))
     
