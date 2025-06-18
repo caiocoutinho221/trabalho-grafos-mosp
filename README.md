@@ -75,7 +75,7 @@ Nos processos industriais de corte, a ordem dos padrões influencia diretamente 
 ```bash
 pip install -r requirements.txt
 ```
-2. Execute o script de testes para rodar os experimentos:
+2 - Execute o script de testes para rodar os experimentos:
 
 ```bash
 python testes.py
